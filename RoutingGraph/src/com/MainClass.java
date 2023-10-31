@@ -30,6 +30,9 @@ public class MainClass {
             }
             nodes.add(node);
         }
+
+
+
         Input input = new Input(nodes,Utility.defaultCost(nodes));
         distanceCalculate.initSolution(input);
         System.out.println("Hello word");
