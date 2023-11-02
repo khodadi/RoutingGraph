@@ -2,25 +2,32 @@ package com.model;
 
 import java.util.ArrayList;
 
-public class Drone {
+public class Drone implements Cloneable {
     private Location location;
     private Integer lunchTime;
     private Integer landTime;
     private Integer capacity;
     private Integer speed;
 
-    private Truck parentNode;
+    private Integer workTime = 0;
+
+    private Integer droneId;
+
+    private Integer truckId;
+
 
     private ArrayList<Node> tracks;
 
     public Drone() {
     }
 
-    public Drone(Integer lunchTime, Integer landTime, Integer capacity, Integer speed) {
+    public Drone(Integer lunchTime, Integer landTime, Integer capacity, Integer speed,Integer droneId,Integer truckId) {
         this.lunchTime = lunchTime;
         this.landTime = landTime;
         this.capacity = capacity;
         this.speed = speed;
+        this.droneId = droneId;
+        this.truckId = truckId;
     }
 
     public Location getLocation() {
@@ -64,6 +71,9 @@ public class Drone {
     }
 
     public ArrayList<Node> getTracks() {
+        if(tracks == null){
+            tracks = new ArrayList<>();
+        }
         return tracks;
     }
 
@@ -71,11 +81,32 @@ public class Drone {
         this.tracks = tracks;
     }
 
-    public Truck getParentNode() {
-        return parentNode;
+    public Integer getTruckId() {
+        return truckId;
     }
 
-    public void setParentNode(Truck parentNode) {
-        this.parentNode = parentNode;
+    public void setTruckId(Integer truckId) {
+        this.truckId = truckId;
+    }
+
+    public Integer getDroneId() {
+        return droneId;
+    }
+
+    public Integer getWorkTime() {
+        return workTime;
+    }
+
+    public void setWorkTime(Integer workTime) {
+        this.workTime = workTime;
+    }
+
+    public void setDroneId(Integer droneId) {
+        this.droneId = droneId;
+    }
+
+    @Override
+    public Drone clone() throws CloneNotSupportedException {
+        return (Drone)super.clone();
     }
 }

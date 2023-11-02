@@ -6,6 +6,7 @@ import com.basedata.CustomerType;
 import com.basedata.NodeType;
 import com.model.Input;
 import com.model.Node;
+import com.model.Solution;
 import com.utility.Utility;
 
 import java.util.ArrayList;
@@ -30,9 +31,8 @@ public class MainClass {
             }
             nodes.add(node);
         }
-        // this is test
         Input input = new Input(nodes,Utility.defaultCost(nodes));
-        distanceCalculate.initSolution(input);
+        Solution solution = distanceCalculate.initSolution(input);
         System.out.println("Hello word");
     }
 }

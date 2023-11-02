@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class Solution {
     private ArrayList<Node> stateNodes;
-    Integer cost;
+    Integer cost = 0;
 
     public ArrayList<Node> getStateNodes() {
         return stateNodes;

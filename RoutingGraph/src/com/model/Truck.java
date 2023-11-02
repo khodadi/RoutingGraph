@@ -2,25 +2,32 @@ package com.model;
 
 import java.util.ArrayList;
 
-public class Truck {
+public class Truck implements Cloneable {
     private Integer truckId;
+    private Integer nodeId;
     private Integer capacity;
     private Integer speed;
     private Location location;
-
+    private Integer workTime = 0;
     private Drone drone;
-
-    private Node parentNode;
     ArrayList<Node> tracks;
-
-
     public Truck() {
     }
 
-    public Truck(Integer capacity, Integer speed, Drone drone) {
+    public Truck(Integer capacity, Integer speed, Drone drone,Integer truckId,Integer nodeId) {
         this.capacity = capacity;
         this.speed = speed;
         this.drone = drone;
+        this.truckId = truckId;
+        this.nodeId = nodeId;
+    }
+
+    public Integer getNodeId() {
+        return nodeId;
+    }
+
+    public void setNodeId(Integer nodeId) {
+        this.nodeId = nodeId;
     }
 
     public Integer getCapacity() {
@@ -56,6 +63,9 @@ public class Truck {
     }
 
     public ArrayList<Node> getTracks() {
+        if(tracks == null){
+            tracks = new ArrayList<>();
+        }
         return tracks;
     }
 
@@ -63,13 +73,6 @@ public class Truck {
         this.tracks = tracks;
     }
 
-    public Node getParentNode() {
-        return parentNode;
-    }
-
-    public void setParentNode(Node parentNode) {
-        this.parentNode = parentNode;
-    }
 
     public Integer getTruckId() {
         return truckId;
@@ -77,5 +80,18 @@ public class Truck {
 
     public void setTruckId(Integer truckId) {
         this.truckId = truckId;
+    }
+
+    public Integer getWorkTime() {
+        return workTime;
+    }
+
+    public void setWorkTime(Integer workTime) {
+        this.workTime = workTime;
+    }
+
+    @Override
+    public Truck clone() throws CloneNotSupportedException {
+        return (Truck) super.clone();
     }
 }

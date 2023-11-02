@@ -7,6 +7,8 @@ public class Customer {
     private Integer rejectCost;
     private Integer requestCapacity;
 
+    private boolean accepted;
+
     public Customer() {
     }
 
@@ -14,6 +16,14 @@ public class Customer {
         this.customerType = customerType;
         this.rejectCost = rejectCost;
         this.requestCapacity = requestCapacity;
+    }
+
+    public boolean isAccepted() {
+        return accepted;
+    }
+
+    public void setAccepted(boolean accepted) {
+        this.accepted = accepted;
     }
 
     public CustomerType getCustomerType() {
