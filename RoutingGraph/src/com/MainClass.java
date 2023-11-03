@@ -1,5 +1,6 @@
 package com;
 
+import com.alg.Algorithm;
 import com.alg.DistanceCalculate;
 import com.basedata.Constraint;
 import com.basedata.CustomerType;
@@ -16,7 +17,7 @@ public class MainClass {
 
     public static void main(String[] arg){
 
-        DistanceCalculate distanceCalculate = new DistanceCalculate();
+        Algorithm alg = new Algorithm();
         ArrayList<Node> nodes = new ArrayList<>();
         Node node;
         for(int i = 1; i <= Constraint.Max_Nodes; i++){
@@ -32,7 +33,7 @@ public class MainClass {
             nodes.add(node);
         }
         Input input = new Input(nodes,Utility.defaultCost(nodes));
-        Solution solution = distanceCalculate.initSolution(input);
+        Solution solution = alg.AlgorithmOptimizer(input,50);
         System.out.println("Hello word");
     }
 }

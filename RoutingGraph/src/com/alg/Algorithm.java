@@ -1,23 +1,45 @@
 package com.alg;
 
-import com.basedata.Constraint;
 import com.basedata.CustomerType;
 import com.basedata.NodeType;
 import com.model.*;
-import com.sun.rmi.rmid.ExecPermission;
 import com.utility.Utility;
-
-import java.lang.annotation.Target;
 import java.util.ArrayList;
 
-public class DistanceCalculate {
-    public Solution initSolution(Input input){
+public class Algorithm {
+
+    public Solution AlgorithmOptimizer(Input input,Integer countRepeat){
+        Solution retVal = new Solution();
+        Integer counter = 0;
+        retVal.setStateNodes(Utility.copyArrayNode(input.getNodes()));
+        solution(retVal,input.getNodes().size());
+        Solution currentSolution = new Solution();
+        currentSolution.setStateNodes(Utility.copyArrayNode(retVal.getStateNodes()));
+        currentSolution.setCost(retVal.getCost());
+        while(counter < countRepeat){
+            System.out.println("The cost of solution in loop "+ counter +" is : "+retVal.getCost());
+            counter++;
+            RandomFactory.getInstance().selectNode(currentSolution);
+            solution(currentSolution,input.getNodes().size());
+            if(currentSolution.getCost() < retVal.getCost()){
+                retVal.setStateNodes(Utility.copyArrayNode(currentSolution.getStateNodes()));
+                retVal.setCost(currentSolution.getCost());
+            }else{
+                currentSolution = new Solution();
+                currentSolution.setStateNodes(Utility.copyArrayNode(retVal.getStateNodes()));
+                currentSolution.setCost(retVal.getCost());
+            }
+        }
+        return retVal;
+
+    }
+
+
+    public void solution(Solution retVal,Integer countRepeat){
         int counter = 0;
         MovingDevice movingDroneDevice;
         MovingDevice movingTruckDevice;
-        Solution retVal = new Solution();
-        retVal.setStateNodes(Utility.copyArrayNode(input.getNodes()));
-        while(continueLoop(input.getNodes())  &&   counter < 50){
+        while(continueLoop(retVal.getStateNodes())  &&   counter < countRepeat){
             counter++;
             for(Node node:retVal.getStateNodes()){
                 if(truckCustomer(node)){
@@ -41,19 +63,8 @@ public class DistanceCalculate {
                 }
             }
         }
-
         calculateRejected(retVal);
-
         returnDevice(retVal);
-
-        return retVal;
-    }
-    public void calculateRejected(Solution solution){
-        for(Node node:solution.getStateNodes()){
-            if(node.getNodeType().equals(NodeType.CUSTOMER)  && !node.getCustomer().isAccepted()){
-                solution.setCost(node.getCustomer().getRejectCost() + solution.getCost());
-            }
-        }
     }
     public boolean continueLoop(ArrayList<Node> nodes){
         boolean retVal = false;
@@ -62,6 +73,48 @@ public class DistanceCalculate {
                 retVal = true;
                 break;
             }
+        }
+        return retVal;
+    }
+    public boolean truckCustomer(Node node){
+        boolean retVal = false;
+        try{
+            if(node.getNodeType().equals(NodeType.CUSTOMER)  &&
+                    node.getCustomer().getCustomerType().equals(CustomerType.Truck) &&
+                    !node.getCustomer().isAccepted()){
+                retVal = true;
+            }
+        }catch (Exception e){
+            retVal = false;
+            e.printStackTrace();
+        }
+        return retVal;
+    }
+    public boolean droneCustomer(Node node){
+        boolean retVal = false;
+        try{
+            if(node.getNodeType().equals(NodeType.CUSTOMER) &&
+                    node.getCustomer().getCustomerType().equals(CustomerType.Drone) &&
+                    !node.getCustomer().isAccepted()){
+                retVal = true;
+            }
+        }catch (Exception e){
+            retVal = false;
+            e.printStackTrace();
+        }
+        return retVal;
+    }
+    public boolean jointCustomer(Node node){
+        boolean retVal = false;
+        try{
+            if(node.getNodeType().equals(NodeType.CUSTOMER) &&
+                    node.getCustomer().getCustomerType().equals(CustomerType.Joint) &&
+                    !node.getCustomer().isAccepted()){
+                retVal = true;
+            }
+        }catch (Exception e){
+            retVal = false;
+            e.printStackTrace();
         }
         return retVal;
     }
@@ -89,7 +142,6 @@ public class DistanceCalculate {
         }
         return new MovingDevice(truckId,minNode,target,minCost.equals(1000D)? 0 : minCost.intValue(),currentTime);
     }
-
     public MovingDevice selectDroneSourceNode(Node target, ArrayList<Node> nodes){
         Double currentCost;
         Double minCost = 1000D;
@@ -111,8 +163,8 @@ public class DistanceCalculate {
                 }else{
                     for(Truck truck:node.getTrucks()){
                         if(truck.getDrone()!= null &&
-                           target.getCustomer().getRequestCapacity() <= truck.getDrone().getCapacity() &&
-                           (truck.getDrone().getWorkTime()+workTime) <= (8*60)){
+                                target.getCustomer().getRequestCapacity() <= truck.getDrone().getCapacity() &&
+                                (truck.getDrone().getWorkTime()+workTime) <= (8*60)){
                             minNode = node;
                             droneId = truck.getDrone().getDroneId();
                             minCost = currentCost;
@@ -135,19 +187,6 @@ public class DistanceCalculate {
                 target.getTrucks().add(movingTruck);
             }
 
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-
-
-    public void returnTruck(Truck truck,Node source, Node target){
-        try{
-            if(source != null && target != null){
-                Truck movingTruck = truck.clone();
-                movingTruck.getTracks().add(target);
-                target.getTrucks().add(movingTruck);
-            }
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -195,48 +234,6 @@ public class DistanceCalculate {
         }
         return retVal;
     }
-    public boolean truckCustomer(Node node){
-        boolean retVal = false;
-        try{
-            if(node.getNodeType().equals(NodeType.CUSTOMER)  &&
-                    node.getCustomer().getCustomerType().equals(CustomerType.Truck) &&
-                    !node.getCustomer().isAccepted()){
-                retVal = true;
-            }
-        }catch (Exception e){
-            retVal = false;
-            e.printStackTrace();
-        }
-        return retVal;
-    }
-    public boolean droneCustomer(Node node){
-        boolean retVal = false;
-        try{
-            if(node.getNodeType().equals(NodeType.CUSTOMER) &&
-                    node.getCustomer().getCustomerType().equals(CustomerType.Drone) &&
-                    !node.getCustomer().isAccepted()){
-                retVal = true;
-            }
-        }catch (Exception e){
-            retVal = false;
-            e.printStackTrace();
-        }
-        return retVal;
-    }
-    public boolean jointCustomer(Node node){
-        boolean retVal = false;
-        try{
-            if(node.getNodeType().equals(NodeType.CUSTOMER) &&
-                    node.getCustomer().getCustomerType().equals(CustomerType.Joint) &&
-                    !node.getCustomer().isAccepted()){
-                retVal = true;
-            }
-        }catch (Exception e){
-            retVal = false;
-            e.printStackTrace();
-        }
-        return retVal;
-    }
     public boolean selectionDrone(MovingDevice movingDroneDevice, MovingDevice movingTruckDevice){
         boolean retVal = false;
         if(movingTruckDevice.getCost() == 0 && movingDroneDevice.getCost() != 0 ){
@@ -257,10 +254,36 @@ public class DistanceCalculate {
         }
         return retVal;
     }
+
     public void returnDevice(Solution solution){
         for(Node node:solution.getStateNodes()){
             returnDrone(node,solution);
             returnTruck(node,solution);
+        }
+    }
+    public void returnTruck(Truck truck,Node source, Node target){
+        try{
+            if(source != null && target != null){
+                Truck movingTruck = truck.clone();
+                movingTruck.getTracks().add(target);
+                target.getTrucks().add(movingTruck);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+    public void returnTruck(Node node, Solution solution){
+        if(node.getNodeType().equals(NodeType.CUSTOMER) && node.getTrucks().size() > 0){
+            for(Truck truck:node.getTrucks()){
+                for(Node n: solution.getStateNodes()){
+                    if(n.getNodeId().equals(truck.getNodeId())){
+                        returnTruck(truck,node,n);
+                        solution.setCost(solution.getCost() + Utility.calCostTruck(node,n).intValue());
+                        break;
+                    }
+                }
+            }
+            node.setTrucks(null);
         }
     }
     public void returnDrone(Node node, Solution solution){
@@ -288,18 +311,12 @@ public class DistanceCalculate {
             }
         }
     }
-    public void returnTruck(Node node, Solution solution){
-        if(node.getNodeType().equals(NodeType.CUSTOMER) && node.getTrucks().size() > 0){
-            for(Truck truck:node.getTrucks()){
-                for(Node n: solution.getStateNodes()){
-                    if(n.getNodeId().equals(truck.getNodeId())){
-                        returnTruck(truck,node,n);
-                        solution.setCost(solution.getCost() + Utility.calCostTruck(node,n).intValue());
-                        break;
-                    }
-                }
+
+    public void calculateRejected(Solution solution){
+        for(Node node:solution.getStateNodes()){
+            if(node.getNodeType().equals(NodeType.CUSTOMER)  && !node.getCustomer().isAccepted()){
+                solution.setCost(node.getCustomer().getRejectCost() + solution.getCost());
             }
-            node.setTrucks(null);
         }
     }
 }
